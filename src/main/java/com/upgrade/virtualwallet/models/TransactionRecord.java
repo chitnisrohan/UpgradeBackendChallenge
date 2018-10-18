@@ -1,29 +1,35 @@
 package com.upgrade.virtualwallet.models;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
-public class TransactionRecord {
+public class TransactionRecord implements Comparator {
 
     @Id
     private String id;
     private TransactionType transactionType;
     private double amount;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;
 
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
+
     protected TransactionRecord() {
-        id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID().toString();
     }
 
-    public TransactionRecord(TransactionType transactionType, double amount, Date timestamp) {
+    public TransactionRecord(TransactionType transactionType, double amount, Account account) {
+        this.id = UUID.randomUUID().toString();
         this.transactionType = transactionType;
         this.amount = amount;
-        this.timestamp = timestamp;
+        this.timestamp = new Date();
+        this.account = account;
     }
 
     public String getId() {
@@ -56,5 +62,23 @@ public class TransactionRecord {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    @Override
+    public int compare(Object o1, Object o2) {
+        if (o1 instanceof TransactionRecord && o2 instanceof TransactionRecord) {
+            TransactionRecord transactionRecord1 = (TransactionRecord)o1;
+            TransactionRecord transactionRecord2 = (TransactionRecord)o2;
+            transactionRecord2.getTimestamp().compareTo(transactionRecord1.getTimestamp());
+        }
+        return -1;
     }
 }

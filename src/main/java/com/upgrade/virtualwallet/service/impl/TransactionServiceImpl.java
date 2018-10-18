@@ -1,13 +1,15 @@
 package com.upgrade.virtualwallet.service.impl;
 
-import com.upgrade.virtualwallet.exception.NoDataAvailableException;
 import com.upgrade.virtualwallet.models.Account;
-import com.upgrade.virtualwallet.models.User;
+import com.upgrade.virtualwallet.models.TransactionRecord;
+import com.upgrade.virtualwallet.models.TransactionType;
+import com.upgrade.virtualwallet.repository.AccountRepository;
 import com.upgrade.virtualwallet.repository.TransactionRepository;
 import com.upgrade.virtualwallet.service.TransactionService;
 import com.upgrade.virtualwallet.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -16,10 +18,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
-    private UserService userService;
+    private TransactionRepository transactionRepository;
 
     private Lock balanceChangeLock;
 
@@ -27,24 +29,10 @@ public class TransactionServiceImpl implements TransactionService {
         balanceChangeLock = new ReentrantLock();
     }
 
-    @Override
-    public double findBalance(long acctNo) {
-        return transactionRepository.findByAcctNo(acctNo).get(0).getBalance();
-    }
-
-    @Override
-    public Account createAccount(Account account, long userId) throws NoDataAvailableException {
-        User user = userService.findUser(userId);
-        if (user == null) {
-            throw new NoDataAvailableException("User with userId - "+ userId +" is not present");
-        }
-        account.setUser(user);
-        return transactionRepository.save(account);
-    }
-
+    @Transactional
     @Override
     public double withdraw(long accountNo, double amount) {
-        Account account = transactionRepository.findByAcctNo(accountNo).get(0);
+        Account account = accountRepository.findByAcctNo(accountNo).get(0);
         double balance = account.getBalance();
         if (balance < amount) {
             throw new IllegalStateException("Cannot withdraw amount greater than available balance.");
@@ -52,7 +40,11 @@ public class TransactionServiceImpl implements TransactionService {
         balanceChangeLock.lock();
         try {
             account.setBalance(balance - amount);
-            transactionRepository.save(account);
+            TransactionRecord transactionRecord = new TransactionRecord(TransactionType.WITHDRAW,
+                    amount, account);
+            account.getTransactionRecords().add(transactionRecord);
+            accountRepository.save(account);
+            transactionRepository.save(transactionRecord);
         } finally {
             balanceChangeLock.unlock();
         }

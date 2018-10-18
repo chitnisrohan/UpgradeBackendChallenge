@@ -2,6 +2,7 @@ package com.upgrade.virtualwallet.controller;
 
 import com.upgrade.virtualwallet.models.Account;
 import com.upgrade.virtualwallet.models.User;
+import com.upgrade.virtualwallet.service.AccountService;
 import com.upgrade.virtualwallet.service.TransactionService;
 import com.upgrade.virtualwallet.service.UserService;
 import org.slf4j.Logger;
@@ -19,6 +20,9 @@ public class TransactionController {
     private Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     @Autowired
+    private AccountService accountService;
+
+    @Autowired
     private TransactionService transactionService;
 
     @Autowired
@@ -27,7 +31,7 @@ public class TransactionController {
     @GetMapping(value = "/getBalance/{accountNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getBalance(@PathVariable("accountNo") Long accountNo) {
         try {
-            return new ResponseEntity<>("{\"balance\" : " + transactionService.findBalance(accountNo) + "}",
+            return new ResponseEntity<>("{\"balance\" : " + accountService.findBalance(accountNo) + "}",
                     HttpStatus.OK);
         } catch (Exception exc) {
             logger.error(String.format("Could not get balance for account number : %d", accountNo), exc);
@@ -55,7 +59,7 @@ public class TransactionController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createWallet(@RequestBody Account account, @PathVariable("userId") long userId) {
         try {
-            Account newAccount = transactionService.createAccount(account, userId);
+            Account newAccount = accountService.createAccount(account, userId);
             return new ResponseEntity<>(String.format("{\"message\" : \"Account is created successfully. " +
                     "The account number is : %d\"}", newAccount.getAcctNo()), HttpStatus.OK);
         } catch (Exception exc) {

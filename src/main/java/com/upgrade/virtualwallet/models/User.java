@@ -3,6 +3,7 @@ package com.upgrade.virtualwallet.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -15,17 +16,19 @@ public class User {
     private String lastName;
     private String address;
     private String phone;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @JsonIgnore
-    private Set<Account> accounts;
+    private Set<Account> accounts = new HashSet<>();
 
     protected User() {}
 
-    public User(String firstName, String lastName, String address, String phone) {
+    public User(String firstName, String lastName, String address, String phone, Set<Account> accounts) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
         this.phone = phone;
+        this.accounts = accounts;
     }
 
     public long getId() {
