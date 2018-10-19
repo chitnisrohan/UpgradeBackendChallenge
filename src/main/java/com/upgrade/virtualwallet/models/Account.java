@@ -21,19 +21,17 @@ public class Account {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "account")
     @JsonIgnore
-    private Set<TransactionRecord> transactionRecords = new TreeSet<>(ReverseComparator);
+    private Set<TransactionRecord> transactionRecords = new HashSet<>();
 
     protected Account() {}
 
-    public Account(String branch, double balance, AccountType accountType, User user, TreeSet<TransactionRecord> transactionRecords) {
+    public Account(String branch, double balance, AccountType accountType, User user, Set<TransactionRecord> transactionRecords) {
         this.branch = branch;
         this.balance = balance;
         this.accountType = accountType;
         this.user = user;
         this.transactionRecords = transactionRecords;
     }
-
-
 
     public long getAcctNo() {
         return acctNo;
@@ -82,18 +80,6 @@ public class Account {
     public void setTransactionRecords(Set<TransactionRecord> transactionRecords) {
         this.transactionRecords = transactionRecords;
     }
-
-    private static final Comparator<TransactionRecord> ReverseComparator = new Comparator<TransactionRecord>() {
-        @Override
-        public int compare(TransactionRecord o1, TransactionRecord o2) {
-            if (o1 instanceof TransactionRecord && o2 instanceof TransactionRecord) {
-                TransactionRecord transactionRecord1 = o1;
-                TransactionRecord transactionRecord2 = o2;
-                transactionRecord2.getTimestamp().compareTo(transactionRecord1.getTimestamp());
-            }
-            return -1;
-        }
-    };
 }
 
 

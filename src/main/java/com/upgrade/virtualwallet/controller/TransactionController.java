@@ -81,4 +81,44 @@ public class TransactionController {
             return new ResponseEntity<>("{\"message\" : \"Withdrawal failed!\"}", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping(value = "/deposit/{accountNo}/{amount}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> deposit(@PathVariable("accountNo") long accountNo,
+                                           @PathVariable("amount") double amount) {
+        try {
+            double newBalance = transactionService.deposit(accountNo, amount);
+            return new ResponseEntity<>(String.format("{\"message\" : \"New balance after deposit is - %s\"}", newBalance),
+                    HttpStatus.OK);
+        } catch (Exception exc) {
+            logger.error("Could not deposit amount", exc);
+            return new ResponseEntity<>("{\"message\" : \"Deposit failed!\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping(value = "/reverse/{transactionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> reverse(@PathVariable("transactionId") String transactionId) {
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("{\"message\" : \"Transaction reversal failed!\"}",
+                HttpStatus.INTERNAL_SERVER_ERROR);
+        try {
+            if (transactionService.reverse(transactionId)) {
+                responseEntity = new ResponseEntity<>("{\"message\" : \"Transaction reversed successfully!\"}",
+                        HttpStatus.OK);
+            }
+        } catch (Exception exc) {
+            logger.error("Could not deposit amount", exc);
+        }
+        return responseEntity;
+    }
+
+    @GetMapping(value = "/getNTransactions/{accountNo}/{number}")
+    public ResponseEntity<Object> getNTransactions(@PathVariable("accountNo") long accountNo,
+                                                   @PathVariable("number") int number) {
+        try {
+            return new ResponseEntity<>(transactionService.getTransactions(accountNo, number), HttpStatus.OK);
+        } catch(Exception exc) {
+            logger.error("Could not retrieve transactions", exc);
+            return new ResponseEntity<>("{\"message\" : \"Could not retrieve transactions!\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

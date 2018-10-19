@@ -1,17 +1,17 @@
 package com.upgrade.virtualwallet.models;
 
 import javax.persistence.*;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
-public class TransactionRecord implements Comparator {
+public class TransactionRecord {
 
     @Id
     private String id;
     private TransactionType transactionType;
     private double amount;
+    private boolean reversed;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;
@@ -22,6 +22,7 @@ public class TransactionRecord implements Comparator {
 
     protected TransactionRecord() {
         this.id = UUID.randomUUID().toString();
+        this.reversed = false;
     }
 
     public TransactionRecord(TransactionType transactionType, double amount, Account account) {
@@ -30,6 +31,7 @@ public class TransactionRecord implements Comparator {
         this.amount = amount;
         this.timestamp = new Date();
         this.account = account;
+        this.reversed = false;
     }
 
     public String getId() {
@@ -72,13 +74,11 @@ public class TransactionRecord implements Comparator {
         this.account = account;
     }
 
-    @Override
-    public int compare(Object o1, Object o2) {
-        if (o1 instanceof TransactionRecord && o2 instanceof TransactionRecord) {
-            TransactionRecord transactionRecord1 = (TransactionRecord)o1;
-            TransactionRecord transactionRecord2 = (TransactionRecord)o2;
-            transactionRecord2.getTimestamp().compareTo(transactionRecord1.getTimestamp());
-        }
-        return -1;
+    public boolean isReversed() {
+        return reversed;
+    }
+
+    public void setReversed(boolean reversed) {
+        this.reversed = reversed;
     }
 }
