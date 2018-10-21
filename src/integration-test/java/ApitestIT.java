@@ -4,7 +4,9 @@ import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +15,7 @@ import static org.junit.Assert.*;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ApitestIT implements Runnable {
 
     @BeforeClass
@@ -63,7 +66,7 @@ public class ApitestIT implements Runnable {
     }
 
     @Test
-    public void testGetBalance(){
+    public void test1GetBalance(){
         testBalance((float)123456.0);
     }
 
@@ -78,7 +81,7 @@ public class ApitestIT implements Runnable {
     }
 
     @Test
-    public void testWithdrawAndDeposit() {
+    public void test2WithdrawAndDeposit() {
         expect().statusCode(200).contentType(ContentType.JSON).when()
                 .put("/withdraw/2/100");
         testBalance((float) 123356.0);
@@ -88,7 +91,7 @@ public class ApitestIT implements Runnable {
     }
 
     @Test
-    public void testReverse() {
+    public void test3Reverse() {
         expect().statusCode(500).contentType(ContentType.JSON).when()
                 .put("/reverse/00");
 //        expect().statusCode(200).contentType(ContentType.JSON).when()
@@ -96,14 +99,14 @@ public class ApitestIT implements Runnable {
     }
 
     @Test
-    public void testGetNTransactions() {
+    public void test4GetNTransactions() {
         expect().statusCode(200).contentType(ContentType.JSON).when()
                 .get("/getNTransactions/2/5");
 
     }
 
     @Test
-    public void testConcurrency() {
+    public void test5Concurrency() {
         Thread[] threads = new Thread[10];
         for (int i = 0 ; i < 10; i++) {
             threads[i] = new Thread(this);
