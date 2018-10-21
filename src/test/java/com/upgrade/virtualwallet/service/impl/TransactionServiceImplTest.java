@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import static org.mockito.Mockito.*;
 
 import java.util.*;
@@ -27,7 +28,7 @@ public class TransactionServiceImplTest {
 
     private User user;
     private Account account;
-    List<Account> accountList = new LinkedList<>();
+    private List<Account> accountList = new LinkedList<>();
 
     @Before
     public void setUp() {
@@ -98,4 +99,5 @@ public class TransactionServiceImplTest {
         assertEquals(10, transactionService.getTransactions(1l, 10).size());
 
     }
+
 }
