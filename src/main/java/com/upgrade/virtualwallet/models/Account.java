@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.*;
 
+/**
+ * Represents a Wallet(account) for the user
+ */
 @Entity
 public class Account {
 
@@ -15,7 +18,7 @@ public class Account {
     private double balance;
     private AccountType accountType;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="user_id")
     private User user;
 

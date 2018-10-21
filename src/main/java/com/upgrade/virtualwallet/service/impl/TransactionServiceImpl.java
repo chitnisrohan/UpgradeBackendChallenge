@@ -99,12 +99,7 @@ public class TransactionServiceImpl implements TransactionService {
     public List<TransactionRecord> getTransactions(long accountNo, int number) {
         Account account = accountRepository.findByAcctNo(accountNo).get(0);
         Set<TransactionRecord> transactionRecords = account.getTransactionRecords();
-        Set<TransactionRecord> sortedSet = new TreeSet<>(new Comparator<TransactionRecord>() {
-            @Override
-            public int compare(TransactionRecord o1, TransactionRecord o2) {
-                return o2.getTimestamp().compareTo(o1.getTimestamp());
-            }
-        });
+        Set<TransactionRecord> sortedSet = new TreeSet<>((o1, o2) -> o2.getTimestamp().compareTo(o1.getTimestamp()));
         sortedSet.addAll(transactionRecords);
         return sortedSet.stream().limit(number).collect(Collectors.toList());
     }

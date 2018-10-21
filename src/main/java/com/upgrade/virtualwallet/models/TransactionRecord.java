@@ -1,9 +1,14 @@
 package com.upgrade.virtualwallet.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Represents a unique transaction with a globally unique id
+ */
 @Entity
 public class TransactionRecord {
 
@@ -18,6 +23,7 @@ public class TransactionRecord {
 
     @ManyToOne
     @JoinColumn(name = "account_id")
+    @JsonIgnore
     private Account account;
 
     protected TransactionRecord() {

@@ -3,9 +3,10 @@ package com.upgrade.virtualwallet.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
+/**
+ * Represents a User
+ */
 @Entity
 public class User {
 
@@ -17,18 +18,17 @@ public class User {
     private String address;
     private String phone;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne(mappedBy = "user")
     @JsonIgnore
-    private Set<Account> accounts = new HashSet<>();
+    private Account account;
 
     protected User() {}
 
-    public User(String firstName, String lastName, String address, String phone, Set<Account> accounts) {
+    public User(String firstName, String lastName, String address, String phone) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
         this.phone = phone;
-        this.accounts = accounts;
     }
 
     public long getId() {
@@ -71,11 +71,11 @@ public class User {
         this.phone = phone;
     }
 
-    public Set<Account> getAccounts() {
-        return accounts;
+    public Account getAccount() {
+        return account;
     }
 
-    public void setAccounts(Set<Account> accounts) {
-        this.accounts = accounts;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

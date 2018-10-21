@@ -2,6 +2,7 @@ package com.upgrade.virtualwallet.service.impl;
 
 import com.upgrade.virtualwallet.exception.NoDataAvailableException;
 import com.upgrade.virtualwallet.models.Account;
+import com.upgrade.virtualwallet.models.AccountDTO;
 import com.upgrade.virtualwallet.models.AccountType;
 import com.upgrade.virtualwallet.models.User;
 import com.upgrade.virtualwallet.repository.AccountRepository;
@@ -43,8 +44,7 @@ public class AccountServiceImplTest {
     @Test
     public void findBalance() {
         List<Account> accounts = new LinkedList<>();
-        User user = new User("John", "Doe", "121 Main St.", "8889991111",
-                new HashSet<>());
+        User user = new User("John", "Doe", "121 Main St.", "8889991111");
         accounts.add(new Account("Boston", 7654.90, AccountType.TRANSACTION,
                 user, new HashSet<>()));
         when(accountRepository.findByAcctNo(10)).thenReturn(accounts);
@@ -53,23 +53,25 @@ public class AccountServiceImplTest {
 
     @Test
     public void createAccount() throws Exception {
-        User user = new User("John", "Doe", "121 Main St.", "8889991111",
-                new HashSet<>());
+        User user = new User("John", "Doe", "121 Main St.", "8889991111");
         Account account = new Account("Boston", 7654.90, AccountType.TRANSACTION,
                 user, new HashSet<>());
+        user.setAccount(null);
+        AccountDTO accountDTO = new AccountDTO("Boston", 7654.90, AccountType.TRANSACTION);
         when(userRepository.findById(1l)).thenReturn(Optional.of(user));
         when(userService.findUser(1l)).thenReturn(user);
-        when(accountRepository.save(account)).thenReturn(account);
-        assertEquals(account, accountService.createAccount(account, 1));
+        when(accountRepository.save(any(Account.class))).thenReturn(account);
+        assertEquals("0", accountService.createAccount(accountDTO, 1));
+
+        user.setAccount(account);
+        assertEquals("User already has a wallet with account number - 0",
+                accountService.createAccount(accountDTO, 1));
     }
 
     @Test(expected = NoDataAvailableException.class)
     public void createAccountException() throws Exception {
-        User user = new User("John", "Doe", "121 Main St.", "8889991111",
-                new HashSet<>());
-        Account account = new Account("Boston", 7654.90, AccountType.TRANSACTION,
-                user, new HashSet<>());
+        AccountDTO accountDTO = new AccountDTO("Boston", 7654.90, AccountType.TRANSACTION);
         when(userService.findUser(1l)).thenReturn(null);
-        accountService.createAccount(account, 1);
+        accountService.createAccount(accountDTO, 1l);
     }
 }

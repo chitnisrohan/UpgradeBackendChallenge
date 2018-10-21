@@ -1,6 +1,6 @@
 package com.upgrade.virtualwallet.controller;
 
-import com.upgrade.virtualwallet.models.Account;
+import com.upgrade.virtualwallet.models.AccountDTO;
 import com.upgrade.virtualwallet.models.User;
 import com.upgrade.virtualwallet.service.AccountService;
 import com.upgrade.virtualwallet.service.TransactionService;
@@ -57,11 +57,14 @@ public class TransactionController {
 
     @PostMapping(value = "/createWallet/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createWallet(@RequestBody Account account, @PathVariable("userId") long userId) {
+    public ResponseEntity<String> createWallet(@RequestBody AccountDTO account, @PathVariable("userId") long userId) {
         try {
-            Account newAccount = accountService.createAccount(account, userId);
+            String response = accountService.createAccount(account, userId);
+            if (response.contains("User already has a wallet with account number")) {
+                return new ResponseEntity<>("{\"message\" : \""+response+"\"}", HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(String.format("{\"message\" : \"Account is created successfully. " +
-                    "The account number is : %d\"}", newAccount.getAcctNo()), HttpStatus.OK);
+                    "The account number is : %s\"}", response), HttpStatus.OK);
         } catch (Exception exc) {
             logger.error("Account creation failed.", exc);
             return new ResponseEntity<>("{\"message\" : \"Account creation failed. Please contact administrator.\"}"

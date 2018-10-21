@@ -1,7 +1,7 @@
 package com.upgrade.virtualwallet.service;
 
 import com.upgrade.virtualwallet.exception.NoDataAvailableException;
-import com.upgrade.virtualwallet.models.Account;
+import com.upgrade.virtualwallet.models.AccountDTO;
 
 public interface AccountService {
 
@@ -13,11 +13,11 @@ public interface AccountService {
     double findBalance(long acctNo);
 
     /**
-     * Creates new account in database (Wallet)
+     * Creates new account in database (Wallet). There can be only 1 account per user.
      * @param account account info
      * @param userId account holder id
-     * @return new account created
+     * @return new Account number as string if successful OR error message if failed
      * @throws NoDataAvailableException throws exception when user does not exists
      */
-    Account createAccount(Account account, long userId) throws NoDataAvailableException;
+    String createAccount(AccountDTO account, long userId) throws NoDataAvailableException;
 }
