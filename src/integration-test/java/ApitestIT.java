@@ -2,7 +2,6 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
-import com.jayway.restassured.response.ResponseBody;
 import com.jayway.restassured.specification.RequestSpecification;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -65,20 +64,27 @@ public class ApitestIT implements Runnable {
 
     @Test
     public void testGetBalance(){
+        testBalance((float)123456.0);
+    }
+
+    private void testBalance(Float balanceToVerify) {
         expect().statusCode(200).contentType(ContentType.JSON).when()
                 .get("/getBalance/2");
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.get("/getBalance/2");
+        JsonPath jsonPathEvaluator = response.jsonPath();
+        Float balance = jsonPathEvaluator.get("balance");
+        assertEquals(balanceToVerify, balance);
     }
 
     @Test
-    public void testWithdraw() {
+    public void testWithdrawAndDeposit() {
         expect().statusCode(200).contentType(ContentType.JSON).when()
                 .put("/withdraw/2/100");
-    }
-
-    @Test
-    public void testDeposit() {
+        testBalance((float) 123356.0);
         expect().statusCode(200).contentType(ContentType.JSON).when()
                 .put("/deposit/2/100");
+        testBalance((float)123456.0);
     }
 
     @Test
@@ -93,6 +99,7 @@ public class ApitestIT implements Runnable {
     public void testGetNTransactions() {
         expect().statusCode(200).contentType(ContentType.JSON).when()
                 .get("/getNTransactions/2/5");
+
     }
 
     @Test
@@ -109,12 +116,22 @@ public class ApitestIT implements Runnable {
         Response response = httpRequest.get("/getBalance/2");
         JsonPath jsonPathEvaluator = response.jsonPath();
         Float balance = jsonPathEvaluator.get("balance");
-//        assertEquals(123456.0, balance,0);
+        //assertEquals(123456.0, balance,0);
     }
 
     @Override
     public void run() {
         testWithdraw();
         testDeposit();
+    }
+
+    private void testDeposit() {
+        expect().statusCode(200).contentType(ContentType.JSON).when()
+                .put("/deposit/2/100");
+    }
+
+    private void testWithdraw() {
+        expect().statusCode(200).contentType(ContentType.JSON).when()
+                .put("/withdraw/2/100");
     }
 }
